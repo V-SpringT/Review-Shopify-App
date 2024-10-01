@@ -1,19 +1,19 @@
 /* eslint-disable no-undef */
 
 document.querySelectorAll('.star-rating').forEach(rating => {
-    const stars = rating.querySelectorAll('.star');
-    
-    stars.forEach((star, index) => {
-      star.addEventListener('click', () => {
-        stars.forEach(s => s.classList.remove('filled'));
-        for (let i = 0; i <= index; i++) {
-          stars[i].classList.add('filled');
-        }
-        
-        rating.setAttribute('data-rating', index + 1);
-      });
+  const stars = rating.querySelectorAll('.star');
+  
+  stars.forEach((star, index) => {
+    star.addEventListener('click', () => {
+      stars.forEach(s => s.classList.remove('filled'));
+      for (let i = 0; i <= index; i++) {
+        stars[i].classList.add('filled');
+      }
+      
+      rating.setAttribute('data-rating', index + 1);
     });
   });
+});
 
   const updateDom = (avg)=>{
     const avgDiv = document.getElementById("avg");
@@ -24,7 +24,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
     const stars = document.querySelectorAll(".star")
       stars.forEach(s => s.classList.remove('filled'));
       stars.forEach((star,idx)=>{
-        if(idx<avg.starValue) star.classList.add("filled") //ratingvalue
+        if(idx<avg.starValue) star.classList.add("filled") 
       })
   }
   
@@ -33,7 +33,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
     const Rating = {
         appUrl: "/apps/product-rating",
         init: function() {
-          fetch(this.appUrl + `?customerId=${customerId}&productId=${productId}&shop=${shopDomain}`)
+          fetch(this.appUrl + `/${productId}`)
             .then(response => response.json())
             .then(result => {
               console.log("result", result.data.avgRating);
@@ -50,7 +50,6 @@ document.querySelectorAll('.star-rating').forEach(rating => {
           console.log("Gia tri", ratingValue,  shopDomain)
           const formData = new FormData();
           formData.append("customerId", customerId);
-          formData.append("productId", productId);
           formData.append("shop", shopDomain);
           formData.append("ratingValue", ratingValue);
           const requestOptions = {

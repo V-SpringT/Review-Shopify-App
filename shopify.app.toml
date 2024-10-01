@@ -3,7 +3,7 @@
 client_id = "8cb3d828c75ef9d789b768c6c0222db9"
 name = "product-reviews-app"
 handle = "product-reviews-app-13"
-application_url = "https://assembled-cds-troubleshooting-entrepreneur.trycloudflare.com"
+application_url = "https://doubt-tampa-gpl-professor.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_customers,write_products"
 
 [auth]
 redirect_urls = [
-  "https://assembled-cds-troubleshooting-entrepreneur.trycloudflare.com/auth/callback",
-  "https://assembled-cds-troubleshooting-entrepreneur.trycloudflare.com/auth/shopify/callback",
-  "https://assembled-cds-troubleshooting-entrepreneur.trycloudflare.com/api/auth/callback"
+  "https://doubt-tampa-gpl-professor.trycloudflare.com/auth/callback",
+  "https://doubt-tampa-gpl-professor.trycloudflare.com/auth/shopify/callback",
+  "https://doubt-tampa-gpl-professor.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -40,6 +40,11 @@ api_version = "2024-07"
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
   uri = "/webhooks/app/uninstalled"
+
+[app_proxy]
+url = "https://doubt-tampa-gpl-professor.trycloudflare.com/api/reviews"
+subpath = "product-rating"
+prefix = "apps"
 
 [pos]
 embedded = false

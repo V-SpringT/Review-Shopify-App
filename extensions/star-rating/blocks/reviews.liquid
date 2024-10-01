@@ -7,23 +7,32 @@
   </script>
 </head>
 
+<!-- Phần bình luận -->
+<div class="comment-section">
+  <h3>Đánh giá sản phẩm</h3>
+  {% if customer %}
+  <div class="review-bar" data="{{ customer.id }}">
+    <div class="product-rating">
+      <span id="avg"></span>/5
+      <span>Lượt đánh giá: </span><span id="total"></span>
+    </div>
+    <div id="rating-value" class="star-rating" data-rating="{{ rating }}">
+      {% for i in (1..5) %}
+        <span class="star {% if i <= rating %}filled{% endif %}">★</span>
+      {% endfor %}
+    </div>
+  </div>
 
-<div class="review-bar" data ="{{customer.id}}">
-  <div class="product-rating">
-    <span id="avg"></span>/5
-    <span>Lượt đánh giá: </span><span id="total"></span>
-  </div>
-  <div id="rating-value" class="star-rating" data-rating="{{ rating }}">
-  {% for i in (1..5) %}
-    <span class="star {% if i <= rating %}filled{% endif %}">★</span>
-  {% endfor %}
-  </div>
-  d
+  <form id="comment-form">
+    <textarea id="comment-content" placeholder="Nhập bình luận của bạn..." rows="4" cols="50"></textarea>
+  </form>
   <button type="button" id="myButton" class="custom-button">
-      Review
-  </button>
-</div>   
-
+        Review
+    </button>
+  {% else %}
+  <p>Vui lòng <a href="/account/login">đăng nhập</a> để gửi bình luận.</p>
+  {% endif %}
+</div>
 
 <script src="{{ 'script.js' | asset_url }}" defer></script>
 {% schema %}

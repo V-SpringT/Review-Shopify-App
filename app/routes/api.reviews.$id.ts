@@ -2,28 +2,29 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { cors } from "remix-utils/cors";
 import { authenticate } from "../shopify.server";
+import { createDefinitionReview, createMetafieldsReview } from "../utils/ClientMetafield";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticate.public.appProxy(request);
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const {admin} = await authenticate.public.appProxy(request);
+  const {id} = params
 
-  const url = new URL(request.url);
-  const CustomerId = String(url.searchParams.get("customerId"));
-  const shop = String(url.searchParams.get("shop"));
-  const productId = String(url.searchParams.get("productId"));
-
-  console.log(CustomerId)
-  if (!CustomerId || !shop || !productId) {
+  console.log(id)
+  if (!id) {
     return json({
       message: "Missing data. Required data: customerId, productId, shop",
       method: request.method,
     });
   }
   
-  const response = json({ ok: true, message: "Success"});
-  
+  const responseCreateDefinition = await createDefinitionReview(admin)
+  const responseCreateMetafield = await createMetafieldsReview({admin,id})
+  console.log("Definition Init", responseCreateDefinition, "---", "Metafield Init", responseCreateMetafield)
+  const response = json({ ok: true, message: "Success", data: {a: "EHEHEHEH" } });
 
   return cors(request, response);
 }
+
+
 
 export async function action({ request }: ActionFunctionArgs) {
   await authenticate.public.appProxy(request)
@@ -39,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!CustomerId || !productId || !shop) {
     return json({
       message:
-        "Missing data. Required data: customerId, productId, shop, _action",
+        "Missing data. Required data: product ",
       method: request.method,
     });
   }
