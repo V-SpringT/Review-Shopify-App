@@ -1,4 +1,4 @@
-
+import type {ReviewOfClient} from "./type.server"
 
 export const createDefinitionReview = async (admin: any)=>{
   const query = `mutation CreateMetafieldDefinition($definition: MetafieldDefinitionInput!) {
@@ -73,8 +73,75 @@ export const createMetafieldsReview = async ({admin, id}: any)=>{
     return response
 }
 
-export const updateMetafieldsReview = async ()=>{
+export const updateMetafieldsReview = async ({admin, id, review}: any)=>{
+  const product = await getMetafieldReviews({admin,id})
+
+  const currentReviews = JSON.parse(product.data.product.metafields.edges[0].node.value)
+  currentReviews.reviews.push(review)
+  currentReviews.total_reviews +=1
+  const sum = currentReviews.reviews.reduce((sum:number,val: ReviewOfClient)=>{
+    return sum + val.star
+  },0)
+  const avg = sum/currentReviews.total_reviews
+  currentReviews.average_rating = avg.toFixed(1)
+  console.log(currentReviews)
+
+  const query = `mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+    metafieldsSet(metafields: $metafields) {
+      metafields {
+        id
+        namespace
+        key
+        value
+        type
+      }
+      userErrors {
+        field
+        message
+        code
+      }
+    }
+  }`
   
+  const variables = {
+    metafields: [{
+      ownerId: `gid://shopify/Product/${id}`, 
+      namespace: "reviews",
+      key: "product_reviews",
+      value: JSON.stringify(currentReviews),
+      type: "json"
+    }]
+  };
+  
+  const response = await admin!.graphql(query, { variables });
+  
+  return await response.json()
+}
+
+export const getMetafieldReviews = async ({admin, id}: any)=>{
+
+  const query = `
+  {
+    product(id: "gid://shopify/Product/${id}") {
+      id
+      title
+      metafields(namespace: "reviews", first: 1) {
+        edges {
+          node {
+            id
+            key
+            value
+            type
+          }
+        }
+      }
+    }
+  }
+`
+
+  const product = await admin!.graphql(query)
+
+  return await product?.json()
 }
 
 

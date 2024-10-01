@@ -2,7 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { cors } from "remix-utils/cors";
 import { authenticate } from "../shopify.server";
-import { createDefinitionReview, createMetafieldsReview } from "../utils/ClientMetafield";
+import { createDefinitionReview, createMetafieldsReview, updateMetafieldsReview, getMetafieldReviews } from "../utils/ClientMetafield.server";
+import type  {ReviewOfClient} from '../utils/type.server'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const {admin} = await authenticate.public.appProxy(request);
@@ -15,41 +16,52 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       method: request.method,
     });
   }
-  
-  const responseCreateDefinition = await createDefinitionReview(admin)
-  const responseCreateMetafield = await createMetafieldsReview({admin,id})
-  console.log("Definition Init", responseCreateDefinition, "---", "Metafield Init", responseCreateMetafield)
-  const response = json({ ok: true, message: "Success", data: {a: "EHEHEHEH" } });
 
+  
+  const productMetafield = await getMetafieldReviews({admin,id})
+  if(!productMetafield.data.product.metafields){
+    await createDefinitionReview(admin)
+    await createMetafieldsReview({admin,id})
+  }
+  console.log(productMetafield.data.product.metafields)
+
+
+  const response = json({ ok: true, message: "Success", data: {a: "EHEHEHEH" } });
   return cors(request, response);
 }
 
 
 
-export async function action({ request }: ActionFunctionArgs) {
-  await authenticate.public.appProxy(request)
-
+export async function action({ request, params }: ActionFunctionArgs) {
+  const { admin } = await authenticate.public.appProxy(request)
+  const {id} = params
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
   const CustomerId = String(data.customerId);
-  const productId = String(data.productId);
   const shop = String(data.shop);
   const star = parseInt(String(data.ratingValue))
+  const comment = String(data.comment)
 
-  if (!CustomerId || !productId || !shop) {
+  if (!CustomerId || !id || !shop) {
     return json({
       message:
-        "Missing data. Required data: product ",
+        "Missing data. Required data: product",
       method: request.method,
     });
   }
 
-  console.log(CustomerId, productId, shop, star)
+  console.log(CustomerId, id, shop, star, comment)
 
-  
+  const review: ReviewOfClient= {
+    customerId: CustomerId,
+    shop: shop,
+    star: star,
+    comment: comment
+  }
 
-
+  const responseUpdate = await updateMetafieldsReview({admin, id, review})
+  console.log(responseUpdate)
   const response = json({
     message: "Product removed from your wishlist",
     method: request.method,  

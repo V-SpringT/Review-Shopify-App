@@ -28,7 +28,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
       })
   }
   
-
+  
   document.addEventListener('DOMContentLoaded', function () {
     const Rating = {
         appUrl: "/apps/product-rating",
@@ -36,9 +36,9 @@ document.querySelectorAll('.star-rating').forEach(rating => {
           fetch(this.appUrl + `/${productId}`)
             .then(response => response.json())
             .then(result => {
-              console.log("result", result.data.avgRating);
-              const avg = result.data.avgRating
-              updateDom(avg)
+              console.log("result", result);
+              // const avg = result.data.avgRating
+              // updateDom(avg)
             })
             .catch(error => console.log("error", error));
         },
@@ -47,22 +47,22 @@ document.querySelectorAll('.star-rating').forEach(rating => {
             alert("Please login to review product");
             return;
           }
-          console.log("Gia tri", ratingValue,  shopDomain)
           const formData = new FormData();
           formData.append("customerId", customerId);
           formData.append("shop", shopDomain);
           formData.append("ratingValue", ratingValue);
+          const comment = document.getElementById('comment-content')
+          formData.append("comment", comment ? comment.value: "")
           const requestOptions = {
             method: 'POST',
             body: formData,
             redirect: 'follow'
           };
-          fetch(this.appUrl, requestOptions)
+          fetch(this.appUrl + `/${productId}`, requestOptions)
             .then(response => response.json())
             .then(result => {
-                const avg = result.avgRate
-                console.log("result", avg)
-                updateDom(avg)
+                console.log("result", result)
+                // updateDom(avg)
             })
             .catch(error => console.log('error', error));
 
@@ -76,7 +76,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
   const ReviewButton = document.getElementById('myButton')
   console.log("button", ReviewButton);
   if(ReviewButton){
-    ReviewButton.addEventListener("click",()=>{
+    ReviewButton.addEventListener("click",()=>{  
       if(ratingValueDiv){
         ratingValue = ratingValueDiv.getAttribute(["data-rating"])
       }
