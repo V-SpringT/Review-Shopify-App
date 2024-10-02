@@ -77,8 +77,12 @@ export const updateMetafieldsReview = async ({admin, id, review}: any)=>{
   const product = await getMetafieldReviews({admin,id})
 
   const currentReviews = JSON.parse(product.data.product.metafields.edges[0].node.value)
-  currentReviews.reviews.push(review)
-  currentReviews.total_reviews +=1
+  
+  const updatedReview = currentReviews.reviews.filter((rv : ReviewOfClient)=>rv.customerId != review.customerId)
+  updatedReview.push(review)
+  currentReviews.reviews = updatedReview
+  currentReviews.total_reviews = updatedReview.length
+
   const sum = currentReviews.reviews.reduce((sum:number,val: ReviewOfClient)=>{
     return sum + val.star
   },0)
@@ -145,6 +149,53 @@ export const getMetafieldReviews = async ({admin, id}: any)=>{
 }
 
 
-export const deleteMetafieldsReview = async () =>{
-    
+export const deleteMetafieldsReview = async ({admin, id, CustomerId}: any) =>{
+  const product = await getMetafieldReviews({admin,id})
+
+  const currentReviews = JSON.parse(product.data.product.metafields.edges[0].node.value)
+  
+  const updatedReview = currentReviews.reviews.filter((rv : ReviewOfClient)=>{
+    console.log(rv.customerId, CustomerId)
+    return  rv.customerId != CustomerId
+  })
+  currentReviews.reviews = updatedReview
+  currentReviews.total_reviews = updatedReview.length
+
+  const sum = currentReviews.reviews.reduce((sum:number,val: ReviewOfClient)=>{
+    return sum + val.star
+  },0)
+  const avg = currentReviews.total_reviews == 0 ? sum : sum/currentReviews.total_reviews
+  currentReviews.average_rating = avg.toFixed(1)
+  console.log(currentReviews)
+
+  const query = `mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) {
+    metafieldsSet(metafields: $metafields) {
+      metafields {
+        id
+        namespace
+        key
+        value
+        type
+      }
+      userErrors {
+        field
+        message
+        code
+      }
+    }
+  }`
+  
+  const variables = {
+    metafields: [{
+      ownerId: `gid://shopify/Product/${id}`, 
+      namespace: "reviews",
+      key: "product_reviews",
+      value: JSON.stringify(currentReviews),
+      type: "json"
+    }]
+  };
+  
+  const response = await admin!.graphql(query, { variables });
+  
+  return await response.json()
 }

@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { cors } from "remix-utils/cors";
 import { authenticate } from "../shopify.server";
-import { createDefinitionReview, createMetafieldsReview, updateMetafieldsReview, getMetafieldReviews } from "../utils/ClientMetafield.server";
+import { createDefinitionReview, createMetafieldsReview, updateMetafieldsReview, getMetafieldReviews, deleteMetafieldsReview } from "../utils/ClientMetafield.server";
 import type  {ReviewOfClient} from '../utils/type.server'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -42,7 +42,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const shop = String(data.shop);
   const star = parseInt(String(data.ratingValue))
   const comment = String(data.comment)
-
+  const _action = String(data._action)
   if (!CustomerId || !id || !shop) {
     return json({
       message:
@@ -51,17 +51,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
     });
   }
 
-  console.log(CustomerId, id, shop, star, comment)
+  console.log(CustomerId, id, shop, star, comment, _action)
+  switch(_action){
+    case "update": 
+    const review: ReviewOfClient= {
+      customerId: CustomerId,
+      shop: shop,
+      star: star,
+      comment: comment
+    }
+  
+    const responseUpdate = await updateMetafieldsReview({admin, id, review})
+    console.log(responseUpdate)
+    case "delete":
+      console.log("chay vao day", CustomerId)
 
-  const review: ReviewOfClient= {
-    customerId: CustomerId,
-    shop: shop,
-    star: star,
-    comment: comment
+      const responseDelete = await deleteMetafieldsReview({admin,id,CustomerId})
+      console.log(responseDelete)
   }
-
-  const responseUpdate = await updateMetafieldsReview({admin, id, review})
-  console.log(responseUpdate)
+    
+  
   const response = json({
     message: "Product removed from your wishlist",
     method: request.method,  

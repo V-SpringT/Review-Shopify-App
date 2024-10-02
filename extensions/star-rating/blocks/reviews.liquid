@@ -1,16 +1,18 @@
 <head>
   {{ 'style.css' | asset_url | stylesheet_tag }}
   <script>
-    var customerId = {{ customer.id | json }};
-    var productId = {{ product.id | json }};
-    var shopDomain = {{shop.permanent_domain | json}};
+    const customerId = {{ customer.id | json }};
+    const reviews = {{product.metafields.reviews | json}};
+    const shopDomain = {{shop.permanent_domain | json}};
+    const productId = {{product.id | json}}
   </script>
 </head>
 
-<!-- Phần bình luận -->
 <div class="comment-section">
   <h3>Đánh giá sản phẩm</h3>
   {% if customer %}
+  {% assign reviews = product.metafields.reviews.product_reviews %}
+  <div>{{product.metafields.reviews.product_reviews.reviews}}</div>
   <div class="review-bar" data="{{ customer.id }}">
     <div class="product-rating">
       <span id="avg"></span>/5
@@ -34,7 +36,13 @@
   {% endif %}
 </div>
 
-<script src="{{ 'script.js' | asset_url }}" defer></script>
+<!-- Container để hiển thị danh sách các đánh giá -->
+<div class="review-list">
+  <p>Loading reviews...</p>
+</div>
+
+
+<script src="{{ 'script.js' | asset_url }}" defer></s>
 {% schema %}
 {
   "name": "Product Rating",

@@ -15,19 +15,55 @@ document.querySelectorAll('.star-rating').forEach(rating => {
   });
 });
 
-  const updateDom = (avg)=>{
+
+
+  const updateDom = (star,cmt,avg, toalRv)=>{
+
+    console.log("may lam sao  ", avg)
     const avgDiv = document.getElementById("avg");
     const totalDiv = document.getElementById("total");
-    avgDiv.innerText = avg.avgStar
-    totalDiv.innerText = avg.reviewTotal
-
+    avgDiv.innerText = avg
+    totalDiv.innerText = toalRv
+    const cmtDiv = document.getElementById("comment-content")
+    cmtDiv.value = cmt
     const stars = document.querySelectorAll(".star")
       stars.forEach(s => s.classList.remove('filled'));
-      stars.forEach((star,idx)=>{
-        if(idx<avg.starValue) star.classList.add("filled") 
+      stars.forEach((st,idx)=>{
+        if(idx<star) st.classList.add("filled") 
       })
   }
   
+  function renderReviews(reviews) {
+    var reviewList = document.querySelector('.review-list');
+    
+    if (!reviewList || !reviews || Object.keys(reviews).length === 0) {
+      reviewList.innerHTML = '<p>Không có đánh giá nào.</p>';
+      return;
+    }
+    reviewList.innerHTML = '';
+
+    for (const key in reviews) {
+      if (reviews.hasOwnProperty(key)) {
+        const review = reviews[key];
+        
+        // Tạo HTML cho mỗi review
+        const reviewItem = `
+          <div class="review-item" id="review-${review.customerId}">
+            <div class="review-header">
+              <img class="review-avatar" src="${review.avatar}" alt="null's avatar" />
+              <h3 class="review-name">${review.customerId}</h3>
+            </div>
+            <p class="review-comment">${review.comment}</p>
+            <button id="delete-rv" class="delete-review" data-review-id="${review.customerId}">Xóa</button>
+          </div>
+        `;
+        
+        reviewList.innerHTML += reviewItem;
+      }
+    }
+  }
+
+
   
   document.addEventListener('DOMContentLoaded', function () {
     const Rating = {
@@ -37,12 +73,23 @@ document.querySelectorAll('.star-rating').forEach(rating => {
             .then(response => response.json())
             .then(result => {
               console.log("result", result);
-              // const avg = result.data.avgRating
-              // updateDom(avg)
             })
             .catch(error => console.log("error", error));
+
+
+            const reviewArr= reviews.product_reviews.reviews
+            const starList = document.getElementById("rating-value")
+            if(starList){
+              console.log("Gia tri o day ", reviewArr)
+              const customerReview = reviewArr.find(rv=>rv.customerId == customerId)
+              if(customerReview){
+                updateDom(parseInt(customerReview.star), customerReview.comment,parseFloat( reviews.product_reviews.average_rating),parseInt(reviews.product_reviews.total_reviews))
+              }
+            }
+            
+            renderReviews(reviews.product_reviews.reviews)
         },
-        review: function(ratingValue){
+        review: function(ratingValue, action){
           if(!customerId){
             alert("Please login to review product");
             return;
@@ -53,6 +100,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
           formData.append("ratingValue", ratingValue);
           const comment = document.getElementById('comment-content')
           formData.append("comment", comment ? comment.value: "")
+          formData.append("_action", action)
           const requestOptions = {
             method: 'POST',
             body: formData,
@@ -66,7 +114,7 @@ document.querySelectorAll('.star-rating').forEach(rating => {
             })
             .catch(error => console.log('error', error));
 
-    }
+          },
   }
   Rating.init();
 
@@ -80,10 +128,19 @@ document.querySelectorAll('.star-rating').forEach(rating => {
       if(ratingValueDiv){
         ratingValue = ratingValueDiv.getAttribute(["data-rating"])
       }
-      Rating.review(ratingValue)
+      Rating.review(ratingValue, "update")
       
     })
-  
   }
+
+  const deleteBtn = document.getElementById("delete-rv")
+  if(deleteBtn){
+    deleteBtn.addEventListener("click",()=>{
+      Rating.review(0,"delete")
+    })
+    
+  }
+
+
   });
 
