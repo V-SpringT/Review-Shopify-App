@@ -17,16 +17,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
   }
 
-  
   const productMetafield = await getMetafieldReviews({admin,id})
   if(!productMetafield.data.product.metafields){
     await createDefinitionReview(admin)
     await createMetafieldsReview({admin,id})
   }
-  console.log(productMetafield.data.product.metafields)
 
 
-  const response = json({ ok: true, message: "Success", data: {a: "EHEHEHEH" } });
+  const currentReviews = JSON.parse(productMetafield.data.product.metafields.edges[0].node.value)
+  // console.log(productMetafield.data.product.metafields)
+
+
+  const response = json({ ok: true, message: "Success", data: {reviews: currentReviews } });
   return cors(request, response);
 }
 
@@ -50,25 +52,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
       method: request.method,
     });
   }
-
   console.log(CustomerId, id, shop, star, comment, _action)
-  switch(_action){
-    case "update": 
-    const review: ReviewOfClient= {
-      customerId: CustomerId,
-      shop: shop,
-      star: star,
-      comment: comment
-    }
-  
-    const responseUpdate = await updateMetafieldsReview({admin, id, review})
-    console.log(responseUpdate)
-    case "delete":
+  if(_action == "update"){
+    console.log("HEHEEHEE")
+      const review: ReviewOfClient= {
+        customerId: CustomerId,
+        shop: shop,
+        star: star,
+        comment: comment
+      }
+    
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const responseUpdate = await updateMetafieldsReview({admin, id, review})  
+
+  }else if(_action == "delete"){
       console.log("chay vao day", CustomerId)
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const responseDelete = await deleteMetafieldsReview({admin,id,CustomerId})
-      console.log(responseDelete)
-  }
+    }
+      
     
   
   const response = json({
@@ -77,5 +80,4 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   return cors(request, response);
-
 }

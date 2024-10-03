@@ -3,7 +3,7 @@
 client_id = "8cb3d828c75ef9d789b768c6c0222db9"
 name = "product-reviews-app"
 handle = "product-reviews-app-13"
-application_url = "https://drilling-caused-large-arm.trycloudflare.com"
+application_url = "https://senate-sigma-hindu-exclusion.trycloudflare.com"
 embedded = true
 
 [build]
@@ -13,13 +13,13 @@ include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_customers,write_products"
+scopes = "read_customers,read_themes,write_products,write_themes"
 
 [auth]
 redirect_urls = [
-  "https://drilling-caused-large-arm.trycloudflare.com/auth/callback",
-  "https://drilling-caused-large-arm.trycloudflare.com/auth/shopify/callback",
-  "https://drilling-caused-large-arm.trycloudflare.com/api/auth/callback"
+  "https://senate-sigma-hindu-exclusion.trycloudflare.com/auth/callback",
+  "https://senate-sigma-hindu-exclusion.trycloudflare.com/auth/shopify/callback",
+  "https://senate-sigma-hindu-exclusion.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -42,7 +42,7 @@ api_version = "2024-07"
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://drilling-caused-large-arm.trycloudflare.com/api/reviews"
+url = "https://senate-sigma-hindu-exclusion.trycloudflare.com/api/reviews"
 subpath = "product-rating"
 prefix = "apps"
 

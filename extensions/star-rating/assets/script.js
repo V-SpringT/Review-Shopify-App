@@ -63,8 +63,6 @@ document.querySelectorAll('.star-rating').forEach(rating => {
     }
   }
 
-
-  
   document.addEventListener('DOMContentLoaded', function () {
     const Rating = {
         appUrl: "/apps/product-rating",
@@ -73,21 +71,32 @@ document.querySelectorAll('.star-rating').forEach(rating => {
             .then(response => response.json())
             .then(result => {
               console.log("result", result);
+              const reviewArr= result.data.reviews.reviews
+              const starList = document.getElementById("rating-value")
+              if(starList){
+                console.log("Gia tri o day ", reviewArr)
+                const customerReview = reviewArr.find(rv=>rv.customerId == customerId)
+                if(customerReview){
+                  console.log(customerReview)
+                  updateDom(parseInt(customerReview.star), customerReview.comment,parseFloat( result.data.reviews.average_rating),parseInt(result.data.reviews.total_reviews))
+                }
+            }
+            
+            renderReviews(reviewArr)
+
+            const deleteBtn = document.getElementById("delete-rv")
+            if(deleteBtn){
+              deleteBtn.addEventListener("click",()=>{
+                Rating.review(0,"delete")
+                location.reload()
+              })
+              
+            }
             })
             .catch(error => console.log("error", error));
 
-
-            const reviewArr= reviews.product_reviews.reviews
-            const starList = document.getElementById("rating-value")
-            if(starList){
-              console.log("Gia tri o day ", reviewArr)
-              const customerReview = reviewArr.find(rv=>rv.customerId == customerId)
-              if(customerReview){
-                updateDom(parseInt(customerReview.star), customerReview.comment,parseFloat( reviews.product_reviews.average_rating),parseInt(reviews.product_reviews.total_reviews))
-              }
-            }
             
-            renderReviews(reviews.product_reviews.reviews)
+            
         },
         review: function(ratingValue, action){
           if(!customerId){
@@ -129,17 +138,10 @@ document.querySelectorAll('.star-rating').forEach(rating => {
         ratingValue = ratingValueDiv.getAttribute(["data-rating"])
       }
       Rating.review(ratingValue, "update")
-      
+      this.location.reload()
     })
   }
 
-  const deleteBtn = document.getElementById("delete-rv")
-  if(deleteBtn){
-    deleteBtn.addEventListener("click",()=>{
-      Rating.review(0,"delete")
-    })
-    
-  }
 
 
   });

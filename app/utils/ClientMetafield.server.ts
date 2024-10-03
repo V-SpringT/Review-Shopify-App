@@ -117,9 +117,9 @@ export const updateMetafieldsReview = async ({admin, id, review}: any)=>{
     }]
   };
   
-  const response = await admin!.graphql(query, { variables });
+  await admin!.graphql(query, { variables });
   
-  return await response.json()
+  return currentReviews
 }
 
 export const getMetafieldReviews = async ({admin, id}: any)=>{
@@ -195,7 +195,7 @@ export const deleteMetafieldsReview = async ({admin, id, CustomerId}: any) =>{
     }]
   };
   
-  const response = await admin!.graphql(query, { variables });
+   await admin!.graphql(query, { variables });
   
-  return await response.json()
+  return currentReviews
 }
